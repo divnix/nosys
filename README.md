@@ -28,7 +28,7 @@
       };
 
       # attributes prefixed with 1 (`_`) are kept system independant and the leading `_` is removed
-      _lib.f = x: x
+      _lib.f = x: x;
       # attributes with 2 (`__`) underscores are passed through unmodified
       __functor = self: self;
     });
