@@ -37,8 +37,9 @@
 
 # Systems
 
-The system input can be a remote flake with a `systems` output or a path to a nix file defining the
-plain list of systems.
+The systems can be a Nix list of systems or a path to a nix file with one. This means if you wish,
+you can even point to the file as a flake input, so that downstream can modify the systems with
+`follows`.
 
 `nosys` will use its own defaults if no flake input named `systems` exist. You can also
 simply override systems as a list:

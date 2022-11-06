@@ -4,9 +4,7 @@
 
     lib.noSys = inputs @ {systems ? import ./systems.nix, ...}: f: let
       systems' =
-        if systems ? systems
-        then systems.systems
-        else if builtins.isPath systems || systems ? outPath
+        if builtins.isPath systems || systems ? outPath
         then import systems
         else systems;
     in
