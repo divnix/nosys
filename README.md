@@ -16,29 +16,17 @@
     nosys inputs ({self, nixpkgs, ...}: let
       inherit (nixpkgs.legacyPackages) pkgs;
     in {
+      # system dependant outputs
       devShells.default = self.devShells.dev;
       devShells.dev = pkgs.mkShell {
         buildInputs = with pkgs; [/* ... */];
       };
+
+      # attributes prefixed with 1 (`_`) are kept system independant and the leading `_` is removed
+      _lib.f = x: x
+      # attributes with 2 (`__`) underscores are passed through unmodified
+      __functor = self: self;
     });
-}
-```
-
-# Advanced
-
-You may wish to use both system dependant and independant outputs in your flake:
-```nix
-# flake.nix
-{
-  inputs.nosys.url = "github:nrdxp/nosys";
-
-  outputs = inputs @ {nosys, ...}: {
-    # system dependant outputs
-    inherit (nosys inputs (import ./flake/sys-out.nix)) devShells;
-
-    # system independant outputs
-    lib.inc = x: x + 1;
-  }
 }
 ```
 

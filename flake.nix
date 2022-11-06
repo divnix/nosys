@@ -1,10 +1,8 @@
 {
-  inputs.utils.url = "github:numtide/flake-utils";
-
-  outputs = top @ {utils, ...}: {
+  outputs = {self}: {
     __functor = self: self.lib.noSys;
 
-    lib.noSys = inputs @ {systems ? utils.lib.defaultSystems, ...}: f: let
+    lib.noSys = inputs @ {systems ? import ./systems.nix, ...}: f: let
       systems' =
         if systems ? systems
         then systems.systems
@@ -12,15 +10,17 @@
         then import systems
         else systems;
     in
-      utils.lib.eachSystem systems' (sys: let
-        f' = ins: let
-          inputs = top.self.lib.deSys sys (builtins.removeAttrs ins ["self"]);
-          self = top.self.lib.deSys sys (builtins.removeAttrs ins.self ["inputs"]);
+      self.lib.eachSys systems' (sys: let
+        f' = inputs: let
+          inputs' = self.lib.deSys sys (builtins.removeAttrs inputs ["self"]);
+          self' = self.lib.deSys sys (builtins.removeAttrs inputs.self ["inputs"]);
         in
           # must be recombined after `deSys` to avoid infinite recursion
-          f (inputs // {inherit self;});
+          f (inputs' // {self = self';});
       in
         f' inputs);
+
     lib.deSys = import ./desys.nix;
+    lib.eachSys = import ./eachSys.nix;
   };
 }
