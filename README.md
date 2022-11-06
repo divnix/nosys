@@ -10,10 +10,15 @@
 
   outputs = inputs @ {
     nosys,
-    nixpkgs,
+    nixpkgs, # <---- This `nixpkgs` still has the `system` e.g. legacyPackages.${system}.zlib
     ...
   }:
-    nosys inputs ({self, nixpkgs, ...}: let
+    # just like a regular `outputs` attribute
+    nosys inputs ({
+      self,
+      nixpkgs, # <---- This `nixpkgs` has systems removed e.g. legacyPackages.zlib
+      ...,
+    }: let
       inherit (nixpkgs.legacyPackages) pkgs;
     in {
       # system dependant outputs
