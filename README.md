@@ -12,12 +12,12 @@
     nosys,
     nixpkgs, # <---- This `nixpkgs` still has the `system` e.g. legacyPackages.${system}.zlib
     ...
-  }:
-    nosys inputs (import ./flake/out.nix);
+  }: let outputs = import ./flake/out.nix;
+     in nosys inputs outputs;
 }
 ```
 
-Just like a regular `outputs` attribute:
+Just like a regular `outputs` functor:
 ```nix
 # ./flake/out.nix
 {
