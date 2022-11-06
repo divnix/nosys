@@ -1,9 +1,14 @@
+<!--
+SPDX-FileCopyrightText: 2022 The Standard Authors
+
+SPDX-License-Identifier: Unlicense
+-->
 # Usage
 
 ```nix
 # flake.nix
 {
-  inputs.nosys.url = "github:nrdxp/nosys";
+  inputs.nosys.url = "github:divnix/nosys";
   # file with list of systems: ["x86_64-linux" /* ... */ ]
   inputs.systems.url = "path:./flake/systems.nix";
   inputs.systems.flake = false;
