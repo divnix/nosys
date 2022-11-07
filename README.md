@@ -58,5 +58,5 @@ nosys inputs ({self, ...}: {__systems = ["x86_64-linux"]; /* ... */})
 
 ## Cross Compilation
 
-For advanced cases like `cross-compilation` the system's are still available when needing to
-reference a different system than the one currently being defined.
+For advanced cases like cross-compilation the system's are still available in the usual place when
+needing to reference a different system than the one currently being defined.
