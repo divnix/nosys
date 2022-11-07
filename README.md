@@ -48,8 +48,15 @@ The systems can be a Nix list of systems or a path to a nix file with one. This 
 you can even point to the file as a flake input, so that downstream can modify the systems with
 `follows`.
 
+## Override Default
+
 `nosys` will use its own defaults if no flake input named `systems` exist. You can also
-simply override systems as a list:
+simply override systems as a list with the `__systems` attribute:
 ```nix
-nosys (inputs' // {systems = ["x86_64-darwin"];}) # ({self, ...}:
+nosys inputs ({self, ...}: {__systems = ["x86_64-linux"]; /* ... */})
 ```
+
+## Cross Compilation
+
+For advanced cases like `cross-compilation` the system's are still available when needing to
+reference a different system than the one currently being defined.

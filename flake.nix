@@ -6,7 +6,7 @@
       systems' =
         if builtins.isPath systems || systems ? outPath
         then import systems
-        else systems;
+        else (f inputs).__systems or systems;
     in
       self.lib.eachSys systems' (sys: let
         f' = inputs: let
@@ -14,7 +14,7 @@
           self' = self.lib.deSys sys (builtins.removeAttrs inputs.self ["inputs"]);
         in
           # must be recombined after `deSys` to avoid infinite recursion
-          f (inputs' // {self = self';});
+          builtins.removeAttrs (f (inputs' // {self = self';})) ["__systems"];
       in
         f' inputs);
 
