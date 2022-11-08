@@ -9,11 +9,15 @@ let
     iteration = cutoff: system: fragment:
       if ! (l.isAttrs fragment) || cutoff == 0
       then fragment
-      else if l.hasAttr "${system}" fragment && ! l.isFunction fragment.${system}
-      then fragment // fragment.${system}
-      else if l.hasAttr "${system}" fragment && l.isFunction fragment.${system}
-      then fragment // {__functor = _: fragment.${system};}
-      else l.mapAttrs (_: iteration (cutoff - 1) system) fragment;
+      else let
+        recursed = l.mapAttrs (_: iteration (cutoff - 1) system) fragment;
+      in
+        if l.hasAttr "${system}" fragment
+        then
+          if l.isFunction fragment.${system}
+          then recursed // {__functor = _: fragment.${system};}
+          else recursed // fragment.${system}
+        else recursed;
   in
     iteration 3;
 in
