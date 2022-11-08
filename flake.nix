@@ -13,7 +13,8 @@
     in
       self.lib.eachSys systems' (sys: let
         f' = inputs: let
-          inputs' = self.lib.deSys sys (builtins.removeAttrs inputs ["self"]);
+          # mapAttrs to deSys up to the same depths as in `self`
+          inputs' = builtins.mapAttrs (_: self.lib.deSys sys) (builtins.removeAttrs inputs ["self"]);
           self' = self.lib.deSys sys (builtins.removeAttrs inputs.self ["inputs"]);
         in
           # must be recombined after `deSys` to avoid infinite recursion
