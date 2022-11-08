@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 zimbatm
+# SPDX-FileCopyrightText: 2022 The Standard Authors
+#
+# SPDX-License-Identifier: MIT
+
 # shamelessly stolen from, to modify non-sys handling:
 # https://github.com/numtide/flake-utils/blob/master/default.nix
 #
