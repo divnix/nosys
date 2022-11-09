@@ -3,6 +3,10 @@ SPDX-FileCopyrightText: 2022 The Standard Authors
 
 SPDX-License-Identifier: Unlicense
 -->
+# Init
+
+`nix flake new project -t github:divnix/nosys`
+
 # Usage
 
 ```nix
@@ -17,14 +21,14 @@ SPDX-License-Identifier: Unlicense
     nosys,
     nixpkgs, # <---- This `nixpkgs` still has the `system` e.g. legacyPackages.${system}.zlib
     ...
-  }: let outputs = import ./flake/out.nix;
+  }: let outputs = import ./flake/outputs.nix;
      in nosys inputs outputs;
 }
 ```
 
 Just like a regular `outputs` functor:
 ```nix
-# ./flake/out.nix
+# ./flake/outputs.nix
 {
   self,
   nixpkgs, # <---- This `nixpkgs` has systems removed e.g. legacyPackages.zlib

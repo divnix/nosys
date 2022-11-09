@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Unlicense
 {
+  description = "Nix flakes with `systems` à la carte.";
   outputs = {self}: {
     __functor = self: self.lib.noSys;
 
@@ -24,5 +25,10 @@
 
     lib.deSys = import ./desys.nix;
     lib.eachSys = import ./eachSys.nix;
+
+    templates.default = {
+      path = ./tmpl;
+      description = "Minimal flake with simplified systems handling.";
+    };
   };
 }
