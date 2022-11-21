@@ -3,28 +3,50 @@
 # SPDX-License-Identifier: Unlicense
 {
   description = "Nix flakes with `systems` à la carte.";
-  outputs = {self}: {
-    __functor = self: self.lib.noSys;
+  outputs = {self}: let
+    l = builtins // {
+      # taken from `nixpkgs.lib.debug`
+      traceIf =
+        # Predicate to check
+        pred:
+        # Message that should be traced
+        msg:
+        # Value to return
+        x: if pred then l.trace msg x else x;
+    };
 
-    lib.noSys = inputs @ {systems ? import ./systems.nix, ...}: f: let
+    deSys = import ./desys.nix;
+    eachSys = import ./eachSys.nix;
+    noSys = debug: inputs @ {systems ? import ./systems.nix, ...}: f: let
       systems' =
-        if builtins.isPath systems || systems ? outPath
+        if l.isPath systems || systems ? outPath
         then import systems
         else systems;
     in
-      self.lib.eachSys systems' (sys: let
+      l.traceIf debug "systems ${l.concatStringsSep ", " systems'}"
+      eachSys systems' (sys: let
         f' = inputs: let
           # mapAttrs to deSys up to the same depths as in `self`
-          inputs' = builtins.mapAttrs (_: self.lib.deSys sys) (builtins.removeAttrs inputs ["self"]);
-          self' = self.lib.deSys sys (builtins.removeAttrs inputs.self ["inputs"]);
-        in
+          inputs' = l.mapAttrs (_: deSys debug sys) (l.removeAttrs inputs ["self"]);
+          self' = deSys debug sys (l.removeAttrs inputs.self ["inputs"]);
           # must be recombined after `deSys` to avoid infinite recursion
-          f (inputs' // {self = self';});
+          args = inputs' // {self = self';};
+        in
+          f args;
       in
         f' inputs);
 
-    lib.deSys = import ./desys.nix;
-    lib.eachSys = import ./eachSys.nix;
+  in {
+
+    debug = false;
+    __functor = {debug, ... }: noSys debug;
+
+    lib = {
+      inherit eachSys;
+      # no debug
+      deSys = deSys false;
+      noSys = noSys false;
+    };
 
     templates.default = {
       path = ./tmpl;

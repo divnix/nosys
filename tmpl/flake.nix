@@ -1,11 +1,11 @@
 {
-  inputs.nosys.url = "github:divnix/nosys";
+  inputs.nosys.url = "path:../.";
 
   inputs.systems.url = "path:./flake/systems.nix";
   inputs.systems.flake = false;
 
-  outputs = inputs @ {nosys, ...}: let
+  outputs = inputs @ {nosys, nixpkgs, ...}: let
     outputs = import ./flake/outputs.nix;
   in
-    nosys inputs outputs;
+    (nosys // {debug = true;}) inputs outputs;
 }
