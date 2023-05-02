@@ -26,9 +26,15 @@
     lib.deSys = import ./desys.nix;
     lib.eachSys = import ./eachSys.nix;
 
-    templates.default = {
-      path = ./tmpl;
-      description = "Minimal flake with simplified systems handling.";
+    templates = {
+      default = {
+        path = ./tmpls/default;
+        description = "Minimal flake with simplified systems handling.";
+      };
+      local = {
+        path = ./tmpls/local;
+        description = "Minimal local development environment flake.";
+      };
     };
   };
 }
