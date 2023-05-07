@@ -1,1 +1,1 @@
-tmpl/flake/systems.nix
+tmpls/default/flake/systems.nix
