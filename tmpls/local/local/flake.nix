@@ -3,13 +3,13 @@
   inputs.nosys.url = "github:divnix/nosys";
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   inputs.devshell.url = "github:numtide/devshell";
-  inputs.flake-compat.url = "github:edolstra/flake-compat?ref=refs/pull/55/head";
+  inputs.call-flake.url = "github:divnix/call-flake";
   outputs = inputs @ {
     nosys,
-    flake-compat,
+    call-flake,
     ...
   }:
-    nosys ((flake-compat ../.).inputs // inputs) (
+    nosys ((call-flake ../.).inputs // inputs) (
       {
         self,
         nixpkgs,
