@@ -62,7 +62,38 @@ simply override systems as a list:
 ```nix
 nosys (inputs' // {systems = ["x86_64-darwin"];}) # ({self, ...}:
 ```
-## Cross Compilation
 
-For advanced cases like cross-compilation the system's are still available in the usual place when
+# Nixpkgs Convenience
+
+Defining a flake input called `pkgs` that points to a checkout of nixos/nixpkgs will be handled
+specially, for convenience purposes. Instead of simply desystemizing the input, the package set
+will also be brought to the top-level of the flake's output schema for convenience. Additionally,
+nixpkgs `lib` output will be brought into scope for quick reference of library functions. e.g:
+
+```nix
+{
+  inputs.pkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  outputs = inputs:
+    nosys inputs ({
+      lib, # can reference nixpkgs `lib` directly from output functor
+      pkgs,
+      ...
+    }: {
+      packages.default = pkgs.foo; # instead of pkgs.legacyPackages.foo
+    });
+}
+```
+
+If you need to configure the nixpkgs collection, you can do so by adding the expected `config`
+attribute to the inputs passed to `nosys`:
+```nix
+nosys (inputs // {config.allowUnfree = true;}) ({pkgs, ...}: {
+  # unfree packages are now usable from `pkgs` here
+})
+```
+
+
+## Cross Compilation, et al.
+
+For advanced cases like cross-compilation the systems are still available in the usual place when
 needing to reference a different system than the one currently being defined. 
