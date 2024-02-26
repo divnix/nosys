@@ -3,6 +3,30 @@ SPDX-FileCopyrightText: 2022 The Standard Authors
 
 SPDX-License-Identifier: Unlicense
 -->
+# Why?
+
+There is a long-standing conversation about Nix flakes concerning the handling of
+different system architectures. There has been a lot of back and forth and a lot of
+brainstorming, but for the time being, things have mostly stagnated.
+
+For now, this flake is a straightforward demonstration of the "system as an input"
+concept that has been thrown around for a while now. It is not perfect, and might be
+more appropriate to be handled by Nix upstream eventually, but does offer some genuine
+convenience.
+
+In practice, it makes handling the flake output schema easier when you just don't
+care too much about specially handling the system architecture.
+
+It is deliberately simple, and otherwise keeps the output schema of flakes unmodified
+which should hopefully allow it to work seamlessly with more elaborate tools or flake
+libraries if desired. In fact, it is already an upstream of
+[paisano](https://github.com/paisano-nix/core) to provide this same convenience in that
+project.
+
+In addition, there are also a few optional niceties such as special
+[nixpkgs handling](#nixpkgs-convenience), and an escape hatch for outputs that don't
+need to be system specced.
+
 # Init
 
 `nix flake new project -t github:divnix/nosys`
@@ -42,9 +66,9 @@ in {
     buildInputs = with pkgs; [/* ... */];
   };
 
-  # attributes prefixed with 1 (`_`) are kept system independant and the leading `_` is removed
-  _lib.f = x: x;
-  # attributes with 2 (`__`) underscores are passed through unmodified
+  # attributes prefixed with a single underscore (`_`) are kept system independant
+  _lib.f = x: x; # becomes `outputs.lib.f` in the final flake
+  # attributes with two underscores (`__`) underscores are passed through unmodified
   __functor = self: self.lib.f;
 
 }
@@ -62,7 +86,38 @@ simply override systems as a list:
 ```nix
 nosys (inputs' // {systems = ["x86_64-darwin"];}) # ({self, ...}:
 ```
-## Cross Compilation
 
-For advanced cases like cross-compilation the system's are still available in the usual place when
+# Nixpkgs Convenience
+
+Defining a flake input called `pkgs` that points to a checkout of nixos/nixpkgs will be handled
+specially, for convenience purposes. Instead of simply desystemizing the input, the package set
+will also be brought to the top-level of the flake's output schema for convenience. Additionally,
+nixpkgs `lib` output will be brought into scope for quick reference of library functions. e.g:
+
+```nix
+{
+  inputs.pkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  outputs = inputs:
+    nosys inputs ({
+      lib, # can reference nixpkgs `lib` directly from output functor
+      pkgs,
+      ...
+    }: {
+      packages.default = pkgs.foo; # instead of pkgs.legacyPackages.foo
+    });
+}
+```
+
+If you need to configure the nixpkgs collection, you can do so by adding the expected `config`
+attribute to the inputs passed to `nosys`:
+```nix
+nosys (inputs // {config.allowUnfree = true;}) ({pkgs, ...}: {
+  # unfree packages are now usable from `pkgs` here
+})
+```
+
+
+## Cross Compilation, et al.
+
+For advanced cases like cross-compilation the systems are still available in the usual place when
 needing to reference a different system than the one currently being defined. 
